@@ -32,6 +32,11 @@ if "chat_session" not in st.session_state:
 if "character_ready" not in st.session_state:
     st.session_state.character_ready = False
 
+def _chat_avatar_for_role(role: str):
+    if role == "model" and st.session_state.get("character_image_url"):
+        return st.session_state.character_image_url
+    return None
+
 def generate_image(prompt):
     """
     [기능]: 입력된 텍스트 프롬프트를 기반으로 이미지를 생성합니다.
@@ -197,7 +202,7 @@ if st.session_state.character_ready and st.session_state.chat_session:
 
     for message in st.session_state.chat_history:
         if message["parts"][0] != "네, 알겠습니다. 이제 이 페르소나를 기반으로 대화를 시작하겠습니다!":
-            with st.chat_message(message["role"]):
+            with st.chat_message(message["role"], avatar=_chat_avatar_for_role(message["role"])):
                 st.markdown(message["parts"][0])
 
     user_query = st.chat_input("캐릭터에게 메시지를 보내세요...", key="chat_input")
@@ -211,7 +216,7 @@ if st.session_state.character_ready and st.session_state.chat_session:
                 response = st.session_state.chat_session.send_message(user_query)
                 model_response = response.text
                 st.session_state.chat_history.append({"role": "model", "parts": [model_response]})
-                with st.chat_message("model"):
+                with st.chat_message("model", avatar=_chat_avatar_for_role("model")):
                     st.markdown(model_response)
             except Exception as e:
                 st.error(f"챗봇 응답 생성 중 오류 발생: {e}")
