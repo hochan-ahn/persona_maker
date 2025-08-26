@@ -1,4 +1,3 @@
-# --- 여기부터 코드 시작 ---
 import streamlit as st
 import google.generativeai as genai
 import requests
@@ -34,9 +33,59 @@ if "character_ready" not in st.session_state:
     st.session_state.character_ready = False
 
 def generate_image(prompt):
-    st.info("🎨 무료 요금제에서는 이미지 생성을 지원하지 않습니다. 텍스트 페르소나만 생성합니다.")
-    st.session_state.character_image_url = None
-    return None
+    """
+    [기능]: 입력된 텍스트 프롬프트를 기반으로 이미지를 생성합니다.
+    [용어]: gemini-2.0-flash-preview-image-generation 모델을 사용하여 이미지를 생성합니다.
+           API 호출은 `requests` 라이브러리를 사용합니다.
+    """
+    st.info("🎨 캐릭터 이미지를 생성 중입니다. 잠시만 기다려 주세요...")
+    try:
+        # gemini-2.0-flash-preview-image-generation 모델 API 엔드포인트
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key={IMAGEN_API_KEY}"
+        
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }],
+            "generationConfig": {
+                "responseModalities": ["TEXT", "IMAGE"]
+            },
+        }
+
+        response = requests.post(api_url, headers=headers, data=json.dumps(payload))
+        response.raise_for_status() # HTTP 오류가 발생하면 예외 발생
+
+        result = response.json()
+        
+        # 응답에서 base64 인코딩된 이미지 데이터를 추출
+        # Python에서 JavaScript 옵셔널 체이닝 '?' 문법은 사용할 수 없으므로, 직접 접근 방식과 예외 처리를 활용합니다.
+        base64_data = None
+        if result and result.get("candidates") and len(result["candidates"]) > 0:
+            content = result["candidates"][0].get("content")
+            if content and content.get("parts") and len(content["parts"]) > 0:
+                for part in content["parts"]:
+                    if part.get("inlineData"):
+                        base64_data = part["inlineData"].get("data")
+                        break
+        
+        if base64_data:
+            image_url = f"data:image/png;base64,{base64_data}"
+            st.session_state.character_image_url = image_url
+            st.success("✨ 캐릭터 이미지가 성공적으로 생성되었습니다!")
+            return image_url
+        else:
+            st.error("이미지 생성에 실패했습니다. 유효한 이미지 데이터가 반환되지 않았습니다.")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"이미지 생성 API 호출 중 오류 발생: {e}")
+        return None
+    except Exception as e:
+        st.error(f"이미지 처리 중 오류 발생: {e}")
+        return None
 
 def create_character_and_chat_session():
     profile = st.session_state.input_profile
@@ -174,4 +223,4 @@ else:
 
 st.markdown("---")
 st.caption("powered by Google Gemini API & Streamlit")
-# --- 여기까지 코드 끝 ---
+# --- 여기까지 업데이트된 코드 끝 ---
