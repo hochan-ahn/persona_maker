@@ -138,7 +138,6 @@ def create_character_and_chat_session():
         ]
     )
     st.session_state.chat_history = [
-        {"role": "model", "parts": ["안녕하세요! 어떤 캐릭터를 만들고 싶으신가요? 위 양식을 채워주세요."]},
         {"role": "model", "parts": ["네, 알겠습니다. 이제 이 페르소나를 기반으로 대화를 시작하겠습니다!"]}
     ]
     st.session_state.character_ready = True
