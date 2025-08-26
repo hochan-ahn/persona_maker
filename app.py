@@ -184,7 +184,7 @@ if st.session_state.character_ready:
     col1, col2 = st.columns([1, 2])
     with col1:
         if st.session_state.character_image_url:
-            st.image(st.session_state.character_image_url, caption="생성된 캐릭터 이미지", use_column_width=True)
+            st.image(st.session_state.character_image_url, caption="생성된 캐릭터 이미지", use_container_width=True)
         else:
             st.warning("캐릭터 이미지를 불러올 수 없습니다.")
     with col2:
