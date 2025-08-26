@@ -34,39 +34,9 @@ if "character_ready" not in st.session_state:
     st.session_state.character_ready = False
 
 def generate_image(prompt):
-    st.info("🎨 캐릭터 이미지를 생성 중입니다. 잠시만 기다려 주세요...")
-    try:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key={IMAGEN_API_KEY}"
-        
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        payload = {
-            "instances": {"prompt": prompt},
-            "parameters": {"sampleCount": 1}
-        }
-
-        response = requests.post(api_url, headers=headers, data=json.dumps(payload))
-        response.raise_for_status()
-
-        result = response.json()
-        
-        if result and result.get("predictions") and len(result["predictions"]) > 0:
-            base64_data = result["predictions"][0].get("bytesBase64Encoded")
-            if base64_data:
-                image_url = f"data:image/png;base64,{base64_data}"
-                st.session_state.character_image_url = image_url
-                st.success("✨ 캐릭터 이미지가 성공적으로 생성되었습니다!")
-                return image_url
-        st.error("이미지 생성에 실패했습니다. 유효한 이미지 데이터가 반환되지 않았습니다.")
-        return None
-
-    except requests.exceptions.RequestException as e:
-        st.error(f"이미지 생성 API 호출 중 오류 발생: {e}")
-        return None
-    except Exception as e:
-        st.error(f"이미지 처리 중 오류 발생: {e}")
-        return None
+    st.info("🎨 무료 요금제에서는 이미지 생성을 지원하지 않습니다. 텍스트 페르소나만 생성합니다.")
+    st.session_state.character_image_url = None
+    return None
 
 def create_character_and_chat_session():
     profile = st.session_state.input_profile
