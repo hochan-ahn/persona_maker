@@ -20,7 +20,7 @@ except KeyError:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-CHAT_MODEL = genai.GenerativeModel('gemini-1.5-flash')
+CHAT_MODEL = genai.GenerativeModel('gemini-2.0-flash')
 
 if "character_profile" not in st.session_state:
     st.session_state.character_profile = {}
